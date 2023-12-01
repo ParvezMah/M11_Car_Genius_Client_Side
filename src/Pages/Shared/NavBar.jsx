@@ -1,11 +1,32 @@
 import { Link } from "react-router-dom";
 import Logo from '../../../public/logo.svg'
+import UserIcon from '../../../public/icons/UserIcon.png'
+import { useContext } from "react";
+import { AuthContext } from "../../Providers/Authprovider";
 
 const NavBar = () => {
+    const {logOut, user} = useContext(AuthContext);
+
+    const handleLogOut =()=>{
+        logOut()
+            .then(()=>{
+            })
+            .catch(err =>{
+                console.error(err);
+        })
+    }
 
     const navItems = <>
-                        <li><Link to="/">Home</Link></li>
-                        <li><Link to="/about">About</Link></li>
+                        <li className="text-2xl"><Link to="/">Home</Link></li>
+                        <li className="text-2xl"><Link to="/about">About</Link></li>
+                        {
+                            user?.email 
+                                ? <>
+                                        <li className="text-2xl"><Link to="/bookings">My Bookings</Link></li>
+                                        <li className="text-2xl"><button onClick={handleLogOut}>Log Out</button></li>
+                                  </>
+                                : <li className="text-2xl"><Link to="/login">Log In</Link></li>       
+                        }
                      </>
 
     return (
@@ -29,7 +50,13 @@ const NavBar = () => {
             </ul>
         </div>
         <div className="navbar-end">
-            <button className="btn btn-outline btn-warning">Appointment</button>
+            {
+                user && <img src={UserIcon} alt="" className="h-[50px] mr-4" />
+            }
+            <p className="mr-4 text-2xl">
+                {/* {user ? user.email : ""} */}
+            </p>
+            <button className="btn btn-outline btn-warning text-2xl">Appointment</button>
         </div>
 </div>
     );
