@@ -5,8 +5,9 @@ import { AuthContext } from "../Providers/Authprovider";
 const BookService = () => {
 
     const service = useLoaderData();
+    console.log('Service is : ', service);
     const {user} = useContext(AuthContext);
-    const {_id, price, title, } = service;
+    const {_id, price, title, img } = service;
 
 
     const handleOrderBook = event => {
@@ -23,6 +24,7 @@ const BookService = () => {
             service : title,
             service_id : _id, 
             price : price,
+            img,
         }
         console.log('My booking is : ', booking);
 
