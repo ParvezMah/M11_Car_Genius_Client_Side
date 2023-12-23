@@ -1,20 +1,78 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Providers/Authprovider";
 import BookingsRow from "./BookingsRow";
+import axios from "axios";
 
 const Bookings = () => {
 
     const {user} = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
-    console.log('Bookings : ', bookings);
+    // console.log('Bookings : ', bookings);
 
     // const url = `http://localhost:5000/bookings?email=parvezmahmudaa100@gmail.com&sort=1`
     const url = `http://localhost:5000/bookings?email=${user?.email}`;
+
     useEffect(()=>{
-        fetch(url)
+        if(user.email){
+            axios.get(url, {withCredentials:true})
+            .then(res=>{
+                setBookings(res.data);
+            })
+        }
+    },[url,user])
+
+
+    // useEffect(()=>{
+    //     fetch(url)
+    //     .then(res => res.json())
+    //     .then(data=> setBookings(data))
+    // },[url])
+console.log({bookings});
+
+    const handleDelete = (id)=>{
+        const proceed = confirm('Are you sure that you want to Delete?');
+        if(proceed){
+            console.log('You have Deleted');
+
+            fetch(`http://localhost:5000/bookings/${id}`,{
+                method: 'DELETE'
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                if(data.deletedCount > 0){
+                    alert('You have Deleted Successfully!');
+                    // Baki Ja ace Tader ke UI te pathate hobe.
+                    const remaining = bookings.filter(booking => booking._id !==id)
+                    setBookings(remaining);
+                }
+            })
+        }
+    }
+
+
+    const handleBookingConfirm = (id)=>{
+        fetch(`http://localhost:5000/bookings/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'content-type':'application/json'
+            },
+            body: JSON.stringify({status : 'confirm'})
+        })
         .then(res => res.json())
-        .then(data=> setBookings(data))
-    },[])
+        .then(data => {
+            console.log(data);
+            if(data.modifiedCount > 0){
+                // Update State
+                const remaining = bookings.filter(booking => booking._id !== id);
+                const updated = bookings.find(booking => booking._id === id);
+                updated.status = 'confirm'
+                const newBookings = [updated, ...remaining]
+                setBookings(newBookings);
+            }
+        })
+    }
+
 
     return (
         <div>
@@ -23,23 +81,28 @@ const Bookings = () => {
                 <table className="table">
                     {/* head */}
                     <thead>
-                    <tr>
-                        <th>
-                        <label>
-                            <input type="checkbox" className="checkbox" />
-                        </label>
-                        </th>
-                        <th>Name</th>
-                        <th>Job</th>
-                        <th>Favorite Color</th>
-                        <th></th>
-                    </tr>
+                        <tr className="bg-base-200">
+                            <th>
+                            <label>
+                                <input type="checkbox" className="checkbox" />
+                            </label>
+                            </th>
+                            <th>Image</th>
+                            <th>Service</th>
+                            <th>customerName</th>
+                            <th>Email</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
                     </thead>
                     <tbody>
                         {
-                            bookings.map(booking => <BookingsRow
+                            bookings?.map(booking => <BookingsRow
                                     key={booking._id}
                                     booking={booking}
+                                    handleDelete={handleDelete}
+                                    handleBookingConfirm={handleBookingConfirm}
                             >
                             </BookingsRow>)
                         }

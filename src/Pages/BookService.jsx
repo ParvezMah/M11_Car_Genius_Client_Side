@@ -15,7 +15,8 @@ const BookService = () => {
         const form = event.target;
 
         const name = form.Name.value;
-        const email = user?.email;
+        // const email = user?.email;
+        const email = form.email.value;
         const date = form.Date.value;
         const booking = {
             customerName : name, 
