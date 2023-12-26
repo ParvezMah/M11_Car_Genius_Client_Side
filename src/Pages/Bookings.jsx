@@ -1,32 +1,37 @@
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../Providers/Authprovider";
 import BookingsRow from "./BookingsRow";
-import axios from "axios";
+import useAxiosSecure from "../Hooks/useAxiosSecure";
+
 
 const Bookings = () => {
 
     const {user} = useContext(AuthContext);
     const [bookings, setBookings] = useState([]);
+    const axiosSecure = useAxiosSecure();
     // console.log('Bookings : ', bookings);
 
     // const url = `http://localhost:5000/bookings?email=parvezmahmudaa100@gmail.com&sort=1`
-    const url = `http://localhost:5000/bookings?email=${user?.email}`;
+    const url = `/bookings?email=${user?.email}`;
 
+
+    // By Fetch
     useEffect(()=>{
-        if(user.email){
-            axios.get(url, {withCredentials:true})
-            .then(res=>{
-                setBookings(res.data);
-            })
-        }
-    },[url,user])
+        axiosSecure.get(url)
+        .then(res => setBookings(res.data))
+    },[axiosSecure, url])
 
 
+    // By Axios
     // useEffect(()=>{
-    //     fetch(url)
-    //     .then(res => res.json())
-    //     .then(data=> setBookings(data))
-    // },[url])
+    //     if(user.email){
+    //         axios.get(url, {withCredentials:true})
+    //         .then(res=>{
+    //             setBookings(res.data);
+    //         })
+    //     }
+    // },[url,user])
+
 console.log({bookings});
 
     const handleDelete = (id)=>{
